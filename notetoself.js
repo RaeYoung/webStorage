@@ -9,27 +9,32 @@ function init() {
 	for (var i=0; i<stickiesArray.length; i++) {
 		//得到存储在数组stickiesArray中的键名
 		var key = stickiesArray[i];
-		//从localstorage中获取相应的值
-		var value = localStorage[key];
+		//从localstorage中获取相应的值,需调用json.parse()解析为对象
+		var value = JSON.parse(localStorage[key]);
 		//添加到dom中
 		addStickyToDOM(key, value);
 	}
 }
 
-function addStickyToDOM(key, value) {
+function addStickyToDOM(key, stickyObj) {
 	var stickies = document.getElementById("stickies");
 	var sticky = document.createElement("li");
+	sticky.style.backgroundColor = stickyObj.color;
+
 	var span = document.createElement("span");
 	span.setAttribute("class", "sticky");
-	span.innerHTML = value;
+	span.innerHTML = stickyObj.value;
+
 	var deleteButton = document.createElement("input");	
 	deleteButton.setAttribute("type", "button");
 	deleteButton.setAttribute("value", "Delete");
 	deleteButton.setAttribute("class", "delete_button");
 	deleteButton.setAttribute("id", key);
+
 	sticky.appendChild(span);
 	sticky.appendChild(deleteButton);
 	stickies.appendChild(sticky);
+
 	deleteButton.onclick = deleteSticky;	
 }
 
@@ -37,15 +42,25 @@ function createSticky() {
 	var stickiesArray = getStickiesArray();
 	//用时间方法来创建唯一的键
 	var key = "sticky_" + (new Date()).getTime();
+	//通过获取选择颜色的选项来获取值
+	var colorSelectObj = document.getElementById("note_color");
+	var index = colorSelectObj.selectedIndex;
+	var color = colorSelectObj[index].value;
+	
 	var value = document.getElementById("note_text").value;
+	//便利贴对象，包含文本和颜色两个属性
+	var stickyObj = {
+		"value":value,
+		"color":color
+	}
 	//键值对保存在localstorage中
-	localStorage.setItem(key, value);
+	localStorage.setItem(key, JSON.stringify(stickyObj));
 	//使用push方法，将key追加到数组的末尾
 	stickiesArray.push(key);
 	//将数组转换为json字符串格式为键“stickiesArray”的值，保存在localstorage中
 	localStorage.setItem("stickiesArray", JSON.stringify(stickiesArray));
 
-	addStickyToDOM(key, value);
+	addStickyToDOM(key, stickyObj);
 }
 
 function getStickiesArray() {
