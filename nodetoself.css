@@ -19,6 +19,7 @@ form input#note_text {
 /* sticky note */
 
 ul#stickies li {
+	position: relative;
 	display: block;
 	list-style: none;
 	z-index: 1;
@@ -46,6 +47,13 @@ ul#stickies li {
 ul#stickies li span.sticky {
 	font-family: Verdana, Helvetica, sans-serif;
 	font-size: 200%;
+}
+
+ul#stickies li input.delete_button {
+	position: absolute;
+	width: 50px;
+	bottom: 50px;
+	left: 90px;
 }
 
 /* 

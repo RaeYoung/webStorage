@@ -1,8 +1,8 @@
 window.onload = init;
 
 function init() {
-	var button = document.getElementById("add_button");
-	button.onclick = createSticky;
+	var addButton = document.getElementById("add_button");
+	addButton.onclick = createSticky;
 
 	var stickiesArray = getStickiesArray();
 
@@ -12,18 +12,25 @@ function init() {
 		//从localstorage中获取相应的值
 		var value = localStorage[key];
 		//添加到dom中
-		addStickyToDOM(value);
+		addStickyToDOM(key, value);
 	}
 }
 
-function addStickyToDOM(value) {
+function addStickyToDOM(key, value) {
 	var stickies = document.getElementById("stickies");
 	var sticky = document.createElement("li");
 	var span = document.createElement("span");
 	span.setAttribute("class", "sticky");
 	span.innerHTML = value;
+	var deleteButton = document.createElement("input");	
+	deleteButton.setAttribute("type", "button");
+	deleteButton.setAttribute("value", "Delete");
+	deleteButton.setAttribute("class", "delete_button");
+	deleteButton.setAttribute("id", key);
 	sticky.appendChild(span);
-	stickies.appendChild(sticky);	
+	sticky.appendChild(deleteButton);
+	stickies.appendChild(sticky);
+	deleteButton.onclick = deleteSticky;	
 }
 
 function createSticky() {
@@ -38,7 +45,7 @@ function createSticky() {
 	//将数组转换为json字符串格式为键“stickiesArray”的值，保存在localstorage中
 	localStorage.setItem("stickiesArray", JSON.stringify(stickiesArray));
 
-	addStickyToDOM(value);
+	addStickyToDOM(key, value);
 }
 
 function getStickiesArray() {
@@ -53,4 +60,29 @@ function getStickiesArray() {
 		stickiesArray = JSON.parse(stickiesArray);
 	}
 	return stickiesArray;
+}
+
+function deleteSticky(e) {
+	//target是所点击并生成事件的元素
+	var key = e.target.id;
+	//从localstorage中删除要删除的键值对
+	localStorage.removeItem(key);
+	var stickiesArray = getStickiesArray();
+	//确保有一个stickiesArray数组
+	if (stickiesArray) {
+		for (var i=0; i<stickiesArray.length; i++) {
+			if (key == stickiesArray[i]) {
+				//splice(i, 1), 从i指定的位置开始的元素删除1个元素
+				stickiesArray.splice(i, 1);
+			}
+		}
+	}
+	localStorage.setItem("stickiesArray", JSON.stringify(stickiesArray));
+	deleteStickyFromDOM(key);
+}
+
+function deleteStickyFromDOM(key) {
+	var deleteButton = document.getElementById(key);
+	var sticky = deleteButton.parentNode;
+	sticky.parentNode.removeChild(sticky);
 }
